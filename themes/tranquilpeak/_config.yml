@@ -218,7 +218,7 @@ gitalk:
     # Your Github ID (Github username):
     owner: KOIlipher
     # The repo to store comments:
-    repo: https://github.com/KOIlipher/KOIlipher.github.io
+    repo: KOIlipher.github.io
     # The attribute of posts to use to link them to GitHub issues.
     # See all attributes: https://hexo.io/docs/variables#Page-Variables
     # `path` is recommended because the identifier needs to be unique and shorter than 50 characters.
