@@ -212,13 +212,13 @@ gitalk:
     # Switch
     enable: true
     # Your client ID:
-    client_id:
+    client_id: c0306c36f632dd1774e3
     # Your client secret:
-    client_secret:
+    client_secret: 250654ff0951c89be697634dff035adb17113e51
     # Your Github ID (Github username):
-    owner:
+    owner: KOIlipher
     # The repo to store comments:
-    repo:
+    repo: https://github.com/KOIlipher/KOIlipher.github.io
     # The attribute of posts to use to link them to GitHub issues.
     # See all attributes: https://hexo.io/docs/variables#Page-Variables
     # `path` is recommended because the identifier needs to be unique and shorter than 50 characters.
