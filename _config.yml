@@ -14,11 +14,28 @@ timezone: ''
 # URL
 ## Set your site url here. For example, if you use GitHub Page, set url as 'https://username.github.io/project'
 url: https://koilipher.github.io
+# url: https://localhost:4000/
+# root: /
 permalink: :year/:month/:day/:title/
 permalink_defaults:
 pretty_urls:
   trailing_index: true # Set to false to remove trailing 'index.html' from permalinks
   trailing_html: true # Set to false to remove trailing '.html' from permalinks
+#search model
+algolia:
+  appId: "FL22LZR34Y"
+  apiKey: "1b7aef48ac85a8b7ba8153c7d792fe6e"
+  adminApiKey: "f844cc7179cb5ea1e1eb4ffe8f7152c3"
+  chunkSize: 5000
+  indexName: "dev_xiaenblog"
+  fields:
+    - title
+    - tags
+    - date
+    - categories
+    - excerpt
+    - permalink
+    - thumbnailImageUrl
 
 # Directory
 source_dir: source
