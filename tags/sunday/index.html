@@ -43,7 +43,7 @@
     
     <!--STYLES-->
     
-<link rel="stylesheet" href="/assets/css/style-jbe4qbgp0ga9ot2qk1vxlvbntlkgfa7vshsmbcktsxagksplgnncerg7egyo.min.css">
+<link rel="stylesheet" href="/assets/css/style-btg2ccr1vtvuryygm6zpsxbbdkgkogviimuyw4bbf3kebmoi6ohlp9lhshn4.min.css">
 
     <!--STYLES END-->
     
@@ -408,7 +408,7 @@
 <div id="cover" style="background-image:url('/assets/images/cover.jpg');"></div>
         <!--SCRIPTS-->
 
-<script src="/assets/js/script-ygsyrbik9qb0iitswbfwtu0x245rsabwwjsdmpa1c2ncyjpaucden8yme1bg.min.js"></script>
+<script src="/assets/js/script-i0ncleifk89nd1m8nsnjdfunw7vbdoodl5q8rytkmzxmsqzpmgstlxprbg2u.min.js"></script>
 
 <!--SCRIPTS END-->
 
@@ -416,6 +416,20 @@
 
 
 
-        <iframe class="sidebar-profile-bio" frameborder="no" border="0" marginwidth="0" marginheight="0" width=280 height=52 src="//music.163.com/outchain/player?type=2&id=1091773&auto=1&height=32"></iframe>
+        <script src="https://cdn.jsdelivr.net/npm/pjax@VERSION/pjax.min.js"></script>
+        <script>
+            // 对所有链接跳转事件绑定pjax容器container
+            $(document).pjax('a[target!=_blank]', '#container', {fragment:'#container', timeout:8000})
+        </script>
+        <!-- 
+            作者：吴老狗
+            链接：https://juejin.cn/post/684490417421208781 
+        -->
+        <iframe style="position: fixed;
+        bottom: 10px;
+        right: 10px;
+        text-align: center;
+        cursor: pointer;"
+        frameborder="no" border="0" marginwidth="0" marginheight="0" width=280 height=52 src="//music.163.com/outchain/player?type=2&id=1091773&auto=1&height=32"></iframe>
     </body>
 </html>
