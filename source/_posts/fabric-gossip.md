@@ -5,7 +5,7 @@ thumbnailImage: https://img.gejiba.com/images/b800804b3d9a29026f7420469f15d8a7.p
 categories: [Hyperledger Fabric]
 tags: Blockchain
 ---
-Hyperledger Fabric联盟链中Gossip协议、私有数据组织子集介绍，私有数据分发与使用
+Hyperledger Fabric联盟链Gossip协议，私有数据组织子集介绍，私有数据使用
 <!-- more -->
 ## Gossip协议
 
