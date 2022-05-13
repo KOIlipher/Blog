@@ -19,7 +19,7 @@
             <link rel="alternate" type="application/atom+xml" title="RSS" href="/atom.xml">
         
     
-    <script type="application/ld+json">{"@context":"http://schema.org","@type":"BlogPosting","author":{"@type":"Person","name":"Xiaen Sun","sameAs":["https://github.com/","http://stackoverflow.com/users/19011389","mailto:sunxiaen@163.com"],"image":"sxe300400.jpg"},"articleBody":"Hyperledger Fabric联盟链Gossip协议，私有数据组织子集介绍，私有数据使用\n\nGossip协议特性安全、可靠、可扩展保证网络一致性、完整性\n\n持续识别节点(状态离线在线)\n传播账本数据\n新节点接入网络\n\n如何作用Peer节点基于gossip的数据广播操作接收通道中其他节点的信息，并将信息随机发送给通道上的其他节点 （数量是可配置的），数据交换有如下几种形式：\n\nPUSH 交换1次  \nPULL 交换2次  \nPUSH、PULL配合使用 交换3次 （数据一致性角度最佳）\n\n\n优缺点优点：扩展性、一致性收敛、容错、简单、去中心化（对等）缺点：冗余（周围节点发送冗余数据）、延迟（随机传播）\n私有数据分发动机无需创建通道，就可以实现节点间私有数据的传递。某一组组织希望在通道内保持对其他组织数据的私有性。\n授权组织子集私有数据组织子集的授权在collections_config.json中配置，链码中定义的不同的数据对象（type xxx struct { }）可以有不同的policy，policy中指定的都属于私有数据的授权域，其中的任何一个节点都可以成为背书节点，该配置文件信息会映射到链码。与传统的背书策略指定有所不同，体现在思考角度变化为数据（链码中的数据对象）出发。\n123456789101112131415// Peers in Org1 and Org2 will have this private data in a side databasetype marble struct &#123;  ObjectType string `json:&quot;docType&quot;`  Name       string `json:&quot;name&quot;`  Color      string `json:&quot;color&quot;`  Size       int    `json:&quot;size&quot;`  Owner      string `json:&quot;owner&quot;`&#125;// Only peers in Org1 will have this private data in a side databasetype marblePrivateDetails struct &#123;  ObjectType string `json:&quot;docType&quot;`  Name       string `json:&quot;name&quot;`  Price      int    `json:&quot;price&quot;`&#125;\n\n1234567891011121314151617181920// collections_config.json[  &#123;       &quot;name&quot;: &quot;collectionMarbles&quot;,       &quot;policy&quot;: &quot;OR(&#x27;Org1MSP.member&#x27;, &#x27;Org2MSP.member&#x27;)&quot;,       &quot;requiredPeerCount&quot;: 0,       &quot;maxPeerCount&quot;: 3,       &quot;blockToLive&quot;:1000000,       &quot;memberOnlyRead&quot;: true  &#125;,  &#123;       &quot;name&quot;: &quot;collectionMarblePrivateDetails&quot;,       &quot;policy&quot;: &quot;OR(&#x27;Org1MSP.member&#x27;)&quot;,       &quot;requiredPeerCount&quot;: 0,       &quot;maxPeerCount&quot;: 3,       &quot;blockToLive&quot;:3,       &quot;memberOnlyRead&quot;: true  &#125;]\n\n私有数据存储跟踪\n链码提案的transient字段用于私有数据传递。  \n在未提交交易的时候，私有数据存放在节点的transient data store位置。  \n除了首次客户端提案传递私有数据和通过Gossip分发授权节点私有数据外，其余场景都采用HASH标识，交易提交后HASH落块，临时数据transient data store清除，私有数据存入状态数据库。\n\n辅助分发私有数据在组织子集中可以是分布式存储的，背书节点可以通过私有数据的组织子集中的其他节点实现辅助分发，而不仅仅依赖单点的背书节点（即maxPeerCount=0情况），达到高可用。\n\nmaxPeerCount 和 requiredPeerCount 决定背书节点分发私有数据给授权节点的数量约束（collections_config.json 配置）。如果背书节点不能够成功地将私有数据分发到至少 requiredPeerCount 的要求，它将会返回一个错误给客户端。\n\npullRetryThreshodld 表示授权节点在这个门限时间内需要拿到私有数据。（节点配置文件core.yaml -&gt; peer.gossip.pvtData.pullRetryThreshold）。pullRetry过程：在一个被授权节点在提交的时候，若临时存储transient data store中没有私有数据的副本，则该授权节点会从其他授权节点尝试PULL私有数据。\n\n\n注1：pullRetry在pullRetryThreshodld内拿到私有数据：存储私有数据，交易提交账本（私有数据HASH），pullRetry时间内未拿到私有数据： 不存储私有数据，交易提交账本（私有数据HASH）。注2：若节点有被授权但最后未得到私有数据，那么该节点在将来无法背书引用该私有数据的交易，背书无法在状态数据库查询到私有数据的HASH对应数据，到时候链码会报错。\n\n\n参考Doc：在 Fabric 中使用私有数据\n","dateCreated":"2022-05-13T21:25:04+00:00","dateModified":"2022-05-13T14:11:11+00:00","datePublished":"2022-05-13T21:25:04+00:00","description":"Hyperledger Fabric联盟链Gossip协议，私有数据组织子集介绍，私有数据使用","headline":"Hyperledger Fabric学习笔记 数据分发","image":["https://img.gejiba.com/images/b800804b3d9a29026f7420469f15d8a7.png"],"mainEntityOfPage":{"@type":"WebPage","@id":"https://koilipher.github.io/2022/05/13/fabric-gossip/"},"publisher":{"@type":"Organization","name":"Xiaen Sun","sameAs":["https://github.com/","http://stackoverflow.com/users/19011389","mailto:sunxiaen@163.com"],"image":"sxe300400.jpg","logo":{"@type":"ImageObject","url":"sxe300400.jpg"}},"url":"https://koilipher.github.io/2022/05/13/fabric-gossip/","keywords":"Blockchain","thumbnailUrl":"https://img.gejiba.com/images/b800804b3d9a29026f7420469f15d8a7.png"}</script>
+    <script type="application/ld+json">{"@context":"http://schema.org","@type":"BlogPosting","author":{"@type":"Person","name":"Xiaen Sun","sameAs":["https://github.com/","http://stackoverflow.com/users/19011389","mailto:sunxiaen@163.com"],"image":"sxe300400.jpg"},"articleBody":"Hyperledger Fabric联盟链Gossip协议，私有数据组织子集介绍，私有数据使用\n\nGossip协议特性安全、可靠、可扩展保证网络一致性、完整性\n\n持续识别节点(状态离线在线)\n传播账本数据\n新节点接入网络\n\n如何作用Peer节点基于gossip的数据广播操作接收通道中其他节点的信息，并将信息随机发送给通道上的其他节点 （数量是可配置的），数据交换有如下几种形式：\n\nPUSH 交换1次  \nPULL 交换2次  \nPUSH、PULL配合使用 交换3次 （数据一致性角度最佳）\n\n\n优缺点优点：扩展性、一致性收敛、容错、简单、去中心化（对等）缺点：冗余（周围节点发送冗余数据）、延迟（随机传播）\n私有数据分发动机无需创建通道，就可以实现节点间私有数据的传递。某一组组织希望在通道内保持对其他组织数据的私有性。\n授权组织子集私有数据组织子集的授权在collections_config.json中配置，链码中定义的不同的数据对象（type xxx struct { }）可以有不同的policy，policy中指定的都属于私有数据的授权域，其中的任何一个节点都可以成为背书节点，该配置文件信息会映射到链码。与传统的背书策略指定有所不同，体现在思考角度变化为数据（链码中的数据对象）出发。\n123456789101112131415// Peers in Org1 and Org2 will have this private data in a side databasetype marble struct &#123;  ObjectType string `json:&quot;docType&quot;`  Name       string `json:&quot;name&quot;`  Color      string `json:&quot;color&quot;`  Size       int    `json:&quot;size&quot;`  Owner      string `json:&quot;owner&quot;`&#125;// Only peers in Org1 will have this private data in a side databasetype marblePrivateDetails struct &#123;  ObjectType string `json:&quot;docType&quot;`  Name       string `json:&quot;name&quot;`  Price      int    `json:&quot;price&quot;`&#125;\n\n1234567891011121314151617181920// collections_config.json[  &#123;       &quot;name&quot;: &quot;collectionMarbles&quot;,       &quot;policy&quot;: &quot;OR(&#x27;Org1MSP.member&#x27;, &#x27;Org2MSP.member&#x27;)&quot;,       &quot;requiredPeerCount&quot;: 0,       &quot;maxPeerCount&quot;: 3,       &quot;blockToLive&quot;:1000000,       &quot;memberOnlyRead&quot;: true  &#125;,  &#123;       &quot;name&quot;: &quot;collectionMarblePrivateDetails&quot;,       &quot;policy&quot;: &quot;OR(&#x27;Org1MSP.member&#x27;)&quot;,       &quot;requiredPeerCount&quot;: 0,       &quot;maxPeerCount&quot;: 3,       &quot;blockToLive&quot;:3,       &quot;memberOnlyRead&quot;: true  &#125;]\n\n私有数据存储跟踪\n链码提案的transient字段用于私有数据传递。  \n在未提交交易的时候，私有数据存放在节点的transient data store位置。  \n除了首次客户端提案传递私有数据和通过Gossip分发授权节点私有数据外，其余场景都采用HASH标识，交易提交后HASH落块，临时数据transient data store清除，私有数据存入状态数据库。\n\n辅助分发私有数据在组织子集中可以是分布式存储的，背书节点可以通过私有数据的组织子集中的其他节点实现辅助分发，而不仅仅依赖单点的背书节点（即maxPeerCount=0情况），达到高可用。\n\nmaxPeerCount 和 requiredPeerCount 决定背书节点分发私有数据给授权节点的数量约束（collections_config.json 配置）。如果背书节点不能够成功地将私有数据分发到至少 requiredPeerCount 的要求，它将会返回一个错误给客户端。\n\npullRetryThreshodld 表示授权节点在这个门限时间内需要拿到私有数据。（节点配置文件core.yaml -&gt; peer.gossip.pvtData.pullRetryThreshold）。pullRetry过程：在一个被授权节点在提交的时候，若临时存储transient data store中没有私有数据的副本，则该授权节点会从其他授权节点尝试PULL私有数据。\n\n\n注1：pullRetry在pullRetryThreshodld内拿到私有数据：存储私有数据，交易提交账本（私有数据HASH），pullRetry时间内未拿到私有数据： 不存储私有数据，交易提交账本（私有数据HASH）。注2：若节点有被授权但最后未得到私有数据，那么该节点在将来无法背书引用该私有数据的交易，背书无法在状态数据库查询到私有数据的HASH对应数据，到时候链码会报错。\n\n\n参考Doc：在 Fabric 中使用私有数据\n","dateCreated":"2022-05-13T21:25:04+00:00","dateModified":"2022-05-13T14:55:48+00:00","datePublished":"2022-05-13T21:25:04+00:00","description":"Hyperledger Fabric联盟链Gossip协议，私有数据组织子集介绍，私有数据使用","headline":"Hyperledger Fabric学习笔记 数据分发","image":["https://img.gejiba.com/images/b800804b3d9a29026f7420469f15d8a7.png"],"mainEntityOfPage":{"@type":"WebPage","@id":"https://koilipher.github.io/2022/05/13/fabric-gossip/"},"publisher":{"@type":"Organization","name":"Xiaen Sun","sameAs":["https://github.com/","http://stackoverflow.com/users/19011389","mailto:sunxiaen@163.com"],"image":"sxe300400.jpg","logo":{"@type":"ImageObject","url":"sxe300400.jpg"}},"url":"https://koilipher.github.io/2022/05/13/fabric-gossip/","keywords":"Blockchain","thumbnailUrl":"https://img.gejiba.com/images/b800804b3d9a29026f7420469f15d8a7.png"}</script>
     <meta name="description" content="Hyperledger Fabric联盟链Gossip协议，私有数据组织子集介绍，私有数据使用">
 <meta property="og:type" content="blog">
 <meta property="og:title" content="Hyperledger Fabric学习笔记 数据分发">
@@ -30,7 +30,7 @@
 <meta property="og:image" content="https://img.gejiba.com/images/537504f0b98653dbf276b46a2c8bf00b.jpg">
 <meta property="og:image" content="https://img.gejiba.com/images/a8222059287ffe671fb4b476dca8de44.jpg">
 <meta property="article:published_time" content="2022-05-13T21:25:04.000Z">
-<meta property="article:modified_time" content="2022-05-13T14:11:11.780Z">
+<meta property="article:modified_time" content="2022-05-13T14:55:48.233Z">
 <meta property="article:author" content="Xiaen Sun">
 <meta property="article:tag" content="Blockchain">
 <meta name="twitter:card" content="summary">
@@ -709,6 +709,118 @@
 </div>
 
         
+            <div id="algolia-search-modal" class="modal-container">
+    <div class="modal">
+        <div class="modal-header">
+            <span class="close-button"><i class="fa fa-times"></i></span>
+            <a href="https://algolia.com" target="_blank" rel="noopener" class="searchby-algolia text-color-light link-unstyled">
+                <span class="searchby-algolia-text text-color-light text-small">by</span>
+                <img class="searchby-algolia-logo" src="/assets/images/logo-algolia-nebula-blue-full.svg">
+            </a>
+            <i class="search-icon fa fa-search"></i>
+            <form id="algolia-search-form">
+                <input type="text" id="algolia-search-input" name="search"
+                    class="form-control input--large search-input" placeholder="Search "
+                    />
+            </form>
+        </div>
+        <div class="modal-body">
+            <div class="no-result text-color-light text-center">no post found</div>
+            <div class="results">
+                
+                <div class="media">
+                    
+                    <div class="media-body">
+                        <a
+                            class="link-unstyled"
+                            href="https://koilipher.github.io/2022/04/30/hello-world/"
+                            aria-label=": Hello World"
+                        >
+                            <h3 class="media-heading">Hello World</h3>
+                        </a>
+                        <span class="media-meta">
+                            <span class="media-date text-small">
+                                
+                                    Apr 30, 2022
+                                
+                            </span>
+                        </span>
+                        <div class="media-content hide-xs font-merryweather"><p>Welcome to <a target="_blank" rel="noopener" href="https://hexo.io/">Hexo</a>! This is your very first post. Check <a target="_blank" rel="noopener" href="https://hexo.io/docs/">documentation</a> for more info. If you get any problems when using Hexo, you can find the answer in <a target="_blank" rel="noopener" href="https://hexo.io/docs/troubleshooting.html">troubleshooting</a> or you can ask me on <a target="_blank" rel="noopener" href="https://github.com/hexojs/hexo/issues">GitHub</a>.</p></div>
+                    </div>
+                    <div style="clear:both;"></div>
+                    <hr>
+                </div>
+                
+                <div class="media">
+                    
+                    <div class="media-body">
+                        <a
+                            class="link-unstyled"
+                            href="https://koilipher.github.io/2022/04/30/hellosun/"
+                            aria-label=": hellosun"
+                        >
+                            <h3 class="media-heading">hellosun</h3>
+                        </a>
+                        <span class="media-meta">
+                            <span class="media-date text-small">
+                                
+                                    Apr 30, 2022
+                                
+                            </span>
+                        </span>
+                        <div class="media-content hide-xs font-merryweather"></div>
+                    </div>
+                    <div style="clear:both;"></div>
+                    <hr>
+                </div>
+                
+                <div class="media">
+                    
+                    <div class="media-left">
+                        <a
+                            class="link-unstyled"
+                            href="https://koilipher.github.io/2022/05/13/fabric-gossip/"
+                            aria-label=": Hyperledger Fabric学习笔记 数据分发"
+                        >
+                            <img class="media-image" src="https://img.gejiba.com/images/b800804b3d9a29026f7420469f15d8a7.png" width="90" height="90"/>
+                        </a>
+                    </div>
+                    
+                    <div class="media-body">
+                        <a
+                            class="link-unstyled"
+                            href="https://koilipher.github.io/2022/05/13/fabric-gossip/"
+                            aria-label=": Hyperledger Fabric学习笔记 数据分发"
+                        >
+                            <h3 class="media-heading">Hyperledger Fabric学习笔记 数据分发</h3>
+                        </a>
+                        <span class="media-meta">
+                            <span class="media-date text-small">
+                                
+                                    May 13, 2022
+                                
+                            </span>
+                        </span>
+                        <div class="media-content hide-xs font-merryweather"><p>Hyperledger Fabric联盟链Gossip协议，私有数据组织子集介绍，私有数据使用</p></div>
+                    </div>
+                    <div style="clear:both;"></div>
+                    <hr>
+                </div>
+                
+            </div>
+        </div>
+        <div class="modal-footer">
+            <p class="results-count text-medium"
+                data-message-zero="no post found"
+                data-message-one="1 post found"
+                data-message-other="{n} posts found">
+                3 posts found
+            </p>
+        </div>
+    </div>
+</div>
+
+        
         
 <div id="cover" style="background-image:url('/assets/images/cover.jpg');"></div>
         <!--SCRIPTS-->
@@ -738,6 +850,17 @@
     
 
 
+
+    
+<script src="/assets/js/moment-with-locales.js"></script>
+
+    
+<script src="/assets/js/algoliasearch.js"></script>
+
+    <script>
+      var algoliaClient = algoliasearch('FL22LZR34Y', '1b7aef48ac85a8b7ba8153c7d792fe6e');
+      var algoliaIndex = algoliaClient.initIndex('dev_xiaenblog');
+    </script>
 
 
         <script src="https://cdn.jsdelivr.net/npm/pjax@VERSION/pjax.min.js"></script>
