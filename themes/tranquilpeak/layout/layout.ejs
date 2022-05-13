@@ -38,6 +38,20 @@
         <% } %>
         <%- partial('_partial/cover', null, {cache: !config.relative_link}) %>
         <%- partial('_partial/script', {post: page}) %>
-        <iframe class="sidebar-profile-bio" frameborder="no" border="0" marginwidth="0" marginheight="0" width=280 height=52 src="//music.163.com/outchain/player?type=2&id=1091773&auto=1&height=32"></iframe>
+        <script src="https://cdn.jsdelivr.net/npm/pjax@VERSION/pjax.min.js"></script>
+        <script>
+            // 对所有链接跳转事件绑定pjax容器container
+            $(document).pjax('a[target!=_blank]', '#container', {fragment:'#container', timeout:8000})
+        </script>
+        <!-- 
+            作者：吴老狗
+            链接：https://juejin.cn/post/684490417421208781 
+        -->
+        <iframe style="position: fixed;
+        bottom: 10px;
+        right: 10px;
+        text-align: center;
+        cursor: pointer;"
+        frameborder="no" border="0" marginwidth="0" marginheight="0" width=280 height=52 src="//music.163.com/outchain/player?type=2&id=1091773&auto=1&height=32"></iframe>
     </body>
 </html>
